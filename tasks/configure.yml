@@ -10,6 +10,7 @@
 - name: Redis | Gather current system somaxconn setting.
   command: sysctl -n net.core.somaxconn
   register: sysctl_somaxconn
+  changed_when: false
 
 - name: Redis | Configure system somaxconn setting.
   sysctl:
