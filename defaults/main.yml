@@ -8,6 +8,7 @@
 ---
 
 redis_ppa:
+redis_enable_repo: ''
 redis_service_state: started
 redis_service_enabled: yes
 redis_conf_template: redis.conf.js
