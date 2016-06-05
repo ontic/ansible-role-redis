@@ -39,9 +39,9 @@ script:
     && (echo 'Idempotence test: pass' && exit 0)
     || (echo 'Idempotence test: fail' && exit 1)
   - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm redis-server --version'
-  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm sudo service redis-server status'
-  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm sudo service redis-server stop'
-  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm sudo service redis-server start'
+  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm service redis-server status'
+  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm service redis-server stop'
+  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm service redis-server start'
   - sudo docker stop "$(cat ${container_id})"
 
 notifications:
