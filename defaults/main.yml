@@ -11,7 +11,7 @@ redis_ppa:
 redis_enable_repo: ''
 redis_service_state: started
 redis_service_enabled: yes
-redis_conf_template: redis.conf.js
+redis_conf_template: redis.conf.j2
 redis_packages:
 redis_daemonize: 'yes'
 redis_pidfile: /var/run/redis.pid
