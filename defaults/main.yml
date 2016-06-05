@@ -14,7 +14,7 @@ redis_service_enabled: yes
 redis_conf_template: redis.conf.j2
 redis_packages:
 redis_daemonize: 'yes'
-redis_pidfile: /var/run/redis.pid
+redis_pidfile: '/var/run/redis/{{ redis_service_name }}.pid'
 redis_port: 6379
 redis_tcp_backlog: 511
 redis_bind: 127.0.0.1
@@ -22,7 +22,7 @@ redis_unixsocket:
 redis_timeout: 0
 redis_tcp_keepalive: 0
 redis_loglevel: notice
-redis_logfile: /var/log/redis/redis.log
+redis_logfile: '/var/log/redis/{{ redis_service_name }}.log'
 redis_databases: 16
 redis_save:
   - 900 1
