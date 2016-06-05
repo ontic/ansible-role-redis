@@ -16,4 +16,4 @@
     group: root
     mode: 0644
   notify: restart redis
-  when: redis_conf_template
+  when: redis_conf_template | default(None) != None
