@@ -14,13 +14,10 @@ env:
     version: 7
     init: /usr/lib/systemd/systemd
     run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
-    service: redis
     playbook: playbook.yml
   - distribution: ubuntu
     version: 16.04
     init: /lib/systemd/systemd
-    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
-    service: redis-server
     playbook: playbook.yml
 
 services:
@@ -40,7 +37,7 @@ script:
     | tee /tmp/output.txt; grep -q 'changed=0.*unreachable=0.*failed=0' /tmp/output.txt
     && (echo 'Idempotence test: pass' && exit 0)
     || (echo 'Idempotence test: fail' && exit 1)
-  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ${service} --version'
+  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm redis-server --version'
   - sudo docker stop "$(cat ${container_id})"
 
 notifications:
