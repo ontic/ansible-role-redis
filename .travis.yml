@@ -20,7 +20,7 @@ env:
     version: 16.04
     init: /lib/systemd/systemd
     run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
-    service: redis
+    service: redis-server
     playbook: playbook.yml
 
 services:
@@ -41,11 +41,6 @@ script:
     && (echo 'Idempotence test: pass' && exit 0)
     || (echo 'Idempotence test: fail' && exit 1)
   - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ${service} --version'
-  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm stat /var/run/${service}.pid'
-  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm service ${service} status'
-  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm service ${service} stop'
-  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm service ${service} start'
-  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm cat /var/log/redis/${service}.log'
   - sudo docker stop "$(cat ${container_id})"
 
 notifications:
