@@ -73,7 +73,16 @@
     chdir: '/usr/local/src/redis-{{ redis_version }}'
     creates: '/usr/local/src/redis-{{ redis_version }}/src/redis-server'
 
-- name: Redis | Add user account.
+- group: name=somegroup state=present
+
+- name: Redis | Add group.
+  become: yes
+  user:
+    name: '{{ redis_group }}'
+    state: present
+    system: yes
+
+- name: Redis | Add user.
   become: yes
   user:
     name: '{{ redis_user }}'
