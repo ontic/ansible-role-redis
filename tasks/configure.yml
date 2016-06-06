@@ -14,6 +14,7 @@
   changed_when: false
 
 - name: Redis | Override system somaxconn setting.
+  become: yes
   sysctl:
     name: net.core.somaxconn
     value: 5
