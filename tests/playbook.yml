@@ -10,5 +10,6 @@
 - hosts: all
   vars:
     redis_ppa: ppa:chris-lea/redis-server
+    redis_service_enabled: no
   roles:
     - { role: ../../ }
