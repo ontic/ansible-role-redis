@@ -46,18 +46,13 @@
     mode: 0644
   when: redis_logfile | default(None) != None
 
-- name: Redis | Redhat| Configure system init file.
+- name: Redis | Determine init system.
   become: yes
-  template:
-    src: '{{ redis_sysconfig_init_template }}'
-    dest: '/etc/sysconfig/redis_{{ redis_port }}'
-    owner: root
-    group: root
-    mode: 0600
-  notify: restart redis
-  when: ansible_os_family == 'RedHat'
+  command: cat /proc/1/cmdline
+  register: init_system
+  changed_when: false
 
-- name: Redis | Debian| Configure system init file.
+- name: Redis | Debian | Configure system init file.
   become: yes
   template:
     src: '{{ redis_sysconfig_init_template }}'
@@ -67,6 +62,17 @@
     mode: 0600
   notify: restart redis
   when: ansible_os_family == 'Debian'
+
+- name: Redis | Redhat | Configure system init file.
+  become: yes
+  template:
+    src: '{{ redis_sysconfig_init_template }}'
+    dest: '/etc/sysconfig/redis_{{ redis_port }}'
+    owner: root
+    group: root
+    mode: 0600
+  notify: restart redis
+  when: ansible_os_family == 'RedHat'
 
 - name: Redis | Configure Redis init file.
   become: yes
@@ -78,6 +84,24 @@
     mode: 0755
   notify: restart redis
 
+- name: Redis | Configure systemd init file.
+  become: yes
+  template:
+    src: redis.service.j2
+    dest: '/lib/systemd/system/redis_{{ redis_port }}.service'
+    owner: root
+    group: root
+    mode: 0640
+  notify: restart redis
+  when: ansible_os_family == 'Debian' and 'systemd' in init_system.stdout
+
+- name: Redis | Add symlink for systemd.
+  file:
+    src: '/lib/systemd/system/redis_{{ redis_port }}.service'
+    dest: '/etc/systemd/system/multi-user.target.wants/redis_{{ redis_port }}.service'
+    state: link
+  when: 'systemd' in init_system.stdout
+
 - name: Redis | Configure configuration file.
   become: yes
   template:
@@ -88,5 +112,6 @@
     mode: 0644
   notify: restart redis
 
-- name: Redis | Apply configuration changes.
+- name: Redis | Reload system configuration.
   meta: flush_handlers
+  when: 'systemd' in init_system.stdout
