@@ -8,7 +8,5 @@
 ---
 
 - hosts: all
-  vars:
-    ansible_service_mgr: systemd
   roles:
     - { role: ../../ }
