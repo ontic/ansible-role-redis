@@ -87,8 +87,3 @@
     group: '{{ redis_group }}'
     mode: 0644
   notify: restart redis
-
-- name: Redis | Start service.
-  service:
-    name: 'redis_service_name'
-    state: started
