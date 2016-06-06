@@ -87,3 +87,6 @@
     group: '{{ redis_group }}'
     mode: 0644
   notify: restart redis
+
+- name: Redis | Apply configuration changes.
+  meta: flush_handlers
