@@ -18,19 +18,6 @@
     - configure
     - service
 
-- name: Redis | Define Redis packages.
-  set_fact:
-    redis_packages: '{{ redis_default_packages | list }}'
-  when: not redis_packages
-  tags:
-    - redis
-    - redis-package
-    - redis-configure
-    - redis-service
-    - package
-    - configure
-    - service
-
 - include: package.yml
   tags:
     - redis
