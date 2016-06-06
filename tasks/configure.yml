@@ -17,7 +17,7 @@
   become: yes
   sysctl:
     name: net.core.somaxconn
-    value: 5
+    value: '{{ redis_tcp_backlog }}'
     state: present
     reload: yes
     ignoreerrors: yes
