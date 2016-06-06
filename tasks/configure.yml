@@ -7,111 +7,24 @@
 
 ---
 
-- name: Redis | Configure working directory.
-  become: yes
-  file:
-    path: '{{ redis_dir }}'
-    owner: '{{ redis_user }}'
-    group: '{{ redis_group }}'
-    state: directory
-    mode: 0755
-
-- name: Redis | Configure pid directory.
-  become: yes
-  file:
-    path: '{{ redis_pidfile | dirname }}'
-    owner: '{{ redis_user }}'
-    group: '{{ redis_group }}'
-    state: directory
-    mode: 0755
-  when: redis_pidfile | default(None) != None
-
-- name: Redis | Configure log directory.
-  become: yes
-  file:
-    path: '{{ redis_logfile | dirname }}'
-    owner: '{{ redis_user }}'
-    group: '{{ redis_group }}'
-    state: directory
-    mode: 0755
-  when: redis_logfile | default(None) != None
-
-- name: Redis | Configure log file.
-  become: yes
-  file:
-    path: '{{ redis_logfile }}'
-    owner: '{{ redis_user }}'
-    group: '{{ redis_group }}'
-    state: touch
-    mode: 0644
-  when: redis_logfile | default(None) != None
-
-- name: Redis | Determine init system.
-  become: yes
-  command: cat /proc/1/cmdline
-  register: init_system
+- name: Redis | Gather current system somaxconn setting.
+  command: sysctl -n net.core.somaxconn
+  register: sysctl_somaxconn
   changed_when: false
 
-- name: Redis | Debian | Configure system init file.
-  become: yes
-  template:
-    src: '{{ redis_sysconfig_init_template }}'
-    dest: '/etc/default/redis_{{ redis_port }}'
-    owner: root
-    group: root
-    mode: 0600
-  notify: restart redis
-  when: ansible_os_family == 'Debian'
+- name: Redis | Configure system somaxconn setting.
+  sysctl:
+    name: net.core.somaxconn
+    value: 5
+  when: sysctl_somaxconn.stdout | int < redis_tcp_backlog
 
-- name: Redis | Redhat | Configure system init file.
-  become: yes
-  template:
-    src: '{{ redis_sysconfig_init_template }}'
-    dest: '/etc/sysconfig/redis_{{ redis_port }}'
-    owner: root
-    group: root
-    mode: 0600
-  notify: restart redis
-  when: ansible_os_family == 'RedHat'
-
-- name: Redis | Configure Redis init file.
-  become: yes
-  template:
-    src: '{{ redis_init_template }}'
-    dest: '/etc/init.d/redis_{{ redis_port }}'
-    owner: root
-    group: root
-    mode: 0755
-  notify: restart redis
-
-- name: Redis | Configure systemd init file.
-  become: yes
-  template:
-    src: redis.service.j2
-    dest: '/lib/systemd/system/redis_{{ redis_port }}.service'
-    owner: root
-    group: root
-    mode: 0640
-  notify: restart redis
-  when: ansible_os_family == 'Debian' and 'systemd' in init_system.stdout
-
-- name: Redis | Add symlink for systemd.
-  file:
-    src: '/lib/systemd/system/redis_{{ redis_port }}.service'
-    dest: '/etc/systemd/system/multi-user.target.wants/redis_{{ redis_port }}.service'
-    state: link
-  when: 'systemd' in init_system.stdout
-
-- name: Redis | Configure configuration file.
+- name: Redis | Configure Redis conf file.
   become: yes
   template:
     src: '{{ redis_conf_template }}'
-    dest: '/etc/redis/{{ redis_port }}.conf'
-    owner: '{{ redis_user }}'
-    group: '{{ redis_group }}'
+    dest: '{{ redis_conf_file }}'
+    owner: root
+    group: root
     mode: 0644
   notify: restart redis
-
-- name: Redis | Reload system configuration.
-  meta: flush_handlers
-  when: 'systemd' in init_system.stdout
+  when: redis_conf_template | default(None) != None

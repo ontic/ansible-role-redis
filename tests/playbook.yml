@@ -8,5 +8,7 @@
 ---
 
 - hosts: all
+  vars:
+    redis_ppa: ppa:chris-lea/redis-server
   roles:
     - { role: ../../ }

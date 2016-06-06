@@ -7,118 +7,41 @@
 
 ---
 
-- name: Redis | Debian | Install dependencies.
+- name: Redis | Debian | Add launchpad PPA.
+  become: yes
+  apt_repository:
+    repo: '{{ redis_ppa }}'
+    update_cache: yes
+  when: ansible_os_family == 'Debian' and redis_ppa
+
+- name: Redis | Debian | Install Redis packages.
   become: yes
   apt:
-    pkg: '{{ item }}'
-    update_cache: yes
-    cache_valid_time: 86400
-  with_items:
-    - gcc
-    - make
-    - libc6-dev
-  when: ansible_os_family == 'Debian'
+    name: '{{ item.name if item.version is not defined else item.name + "=" + item.version }}'
+    cache_valid_time: '{{ item.cache_valid_time | default(omit) }}'
+    deb: '{{ item.deb | default(omit) }}'
+    default_release: '{{ item.default_release | default(omit) }}'
+    dpkg_options: '{{ item.dpkg_options | default(omit) }}'
+    force: '{{ item.force | default(omit) }}'
+    install_recommends: '{{ item.install_recommends | default(omit) }}'
+    purge: '{{ item.purge | default(omit) }}'
+    state: '{{ item.state | default(omit) }}'
+    update_cache: '{{ item.update_cache | default(omit) }}'
+    upgrade: '{{ item.upgrade | default(omit) }}'
+  with_items: '{{ redis_packages }}'
+  when: ansible_os_family == 'Debian' and redis_packages
 
-- name: Redis | RedHat | Install dependencies.
+- name: Redis | RedHat | Install Redis packages.
   become: yes
   yum:
-    name: '{{ item }}'
-  with_items:
-    - gcc
-    - make
-  when: ansible_os_family == 'RedHat'
-
-- name: Redis | Retrieve system somaxconn setting.
-  become: yes
-  command: sysctl -n net.core.somaxconn
-  register: sysctl_somaxconn
-  changed_when: false
-
-- name: Redis | Override system somaxconn setting.
-  sysctl:
-    name: net.core.somaxconn
-    value: 5
-    state: present
-    reload: yes
-    ignoreerrors: yes
-  when: sysctl_somaxconn.stdout | int < redis_tcp_backlog
-
-- name: Redis | Enable system overcommit memory.
-  become: yes
-  sysctl:
-    name: vm.overcommit_memory
-    value: 1
-    state: present
-    reload: yes
-    ignoreerrors: yes
-
-- name: Redis | Download source files.
-  become: yes
-  get_url:
-    url: '{{ redis_download_url }}'
-    dest: '/usr/local/src/redis-{{ redis_version }}.tar.gz'
-
-- name: Redis | Extract source files.
-  become: yes
-  unarchive:
-    src: '/usr/local/src/redis-{{ redis_version }}.tar.gz'
-    dest: /usr/local/src
-    creates: '/usr/local/src/redis-{{ redis_version }}/Makefile'
-    copy: no
-
-- name: Redis | Compile source files.
-  become: yes
-  command: 'make -j{{ ansible_processor_cores + 1 }}'
-  args:
-    chdir: '/usr/local/src/redis-{{ redis_version }}'
-    creates: '/usr/local/src/redis-{{ redis_version }}/src/redis-server'
-
-- name: Redis | Add group.
-  become: yes
-  user:
-    name: '{{ redis_group }}'
-    state: present
-    system: yes
-
-- name: Redis | Add user.
-  become: yes
-  user:
-    name: '{{ redis_user }}'
-    group: '{{ redis_group }}'
-    home: '{{ redis_install_dir }}'
-    comment: Redis
-    state: present
-    system: yes
-
-- name: Redis | Create configuration directory.
-  become: yes
-  file:
-    path: /etc/redis
-    owner: root
-    group: root
-    state: directory
-    mode: 0755
-
-- name: Redis | Create installation directory.
-  become: yes
-  file:
-    path: '{{ redis_install_dir }}'
-    owner: '{{ redis_user }}'
-    group: '{{ redis_group }}'
-    state: directory
-    mode: 0755
-
-- name: Redis | Create runtime directory.
-  become: yes
-  file:
-    path: /var/run/redis
-    owner: '{{ redis_user }}'
-    group: '{{ redis_group }}'
-    state: directory
-
-- name: Redis | Install source files.
-  become: yes
-  command: 'make PREFIX={{ redis_install_dir }} install'
-  args:
-    chdir: '/usr/local/src/redis-{{ redis_version }}'
-    creates: '{{ redis_install_dir }}/bin/redis-server'
+    name: '{{ item.name if item.version is not defined else item.name + "-" + item.version }}'
+    conf_file: '{{ item.conf_file | default(omit) }}'
+    disable_gpg_check: '{{ item.disable_gpg_check | default(omit) }}'
+    disablerepo: '{{ item.disablerepo | default(omit) }}'
+    enablerepo: '{{ item.enablerepo | default(redis_enable_repo) }}'
+    exclude: '{{ item.exclude | default(omit) }}'
+    list: '{{ item.list | default(omit) }}'
+    state: '{{ item.state | default(omit) }}'
+    update_cache: '{{ item.update_cache | default(omit) }}'
+  with_items: '{{ redis_packages }}'
+  when: ansible_os_family == 'RedHat' and redis_packages
