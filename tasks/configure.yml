@@ -28,3 +28,6 @@
     mode: 0644
   notify: restart redis
   when: redis_conf_template | default(None) != None
+
+- name: reload systemd
+  shell: systemctl daemon-reload
