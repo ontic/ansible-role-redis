@@ -8,6 +8,7 @@
 ---
 
 - name: Redis | Enable Redis service.
+  become: yes
   service:
     name: '{{ redis_service_name }}'
     state: '{{ redis_service_state }}'
