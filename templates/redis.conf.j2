@@ -112,13 +112,13 @@ logfile {{ redis_logfile }}
 
 # To enable logging to the system logger, just set 'syslog-enabled' to yes,
 # and optionally update the other syslog parameters to suit your needs.
-# syslog-enabled no
+syslog-enabled {{ redis_syslog_enabled }}
 
 # Specify the syslog identity.
-# syslog-ident redis
+syslog-ident {{ redis_syslog_ident }}
 
 # Specify the syslog facility. Must be USER or between LOCAL0-LOCAL7.
-# syslog-facility local0
+syslog-facility {{ redis_syslog_facility }}
 
 # Set the number of databases. The default database is DB 0, you can select
 # a different one on a per-connection basis using SELECT <dbid> where
@@ -210,14 +210,14 @@ dir {{ redis_dir }}
 #    network partition slaves automatically try to reconnect to masters
 #    and resynchronize with them.
 #
-# slaveof <masterip> <masterport>
+{% if redis_slaveof %}slaveof {{ redis_slaveof }}{% endif %}
 
 # If the master is password protected (using the "requirepass" configuration
 # directive below) it is possible to tell the slave to authenticate before
 # starting the replication synchronization process, otherwise the master will
 # refuse the slave request.
 #
-# masterauth <master-password>
+{% if redis_password %}masterauth {{ redis_password }}{% endif %}
 
 # When a slave loses its connection with the master, or when the replication
 # is still in progress, the slave can act in two different ways:
@@ -230,7 +230,7 @@ dir {{ redis_dir }}
 #    an error "SYNC with master in progress" to all the kind of commands
 #    but to INFO and SLAVEOF.
 #
-slave-serve-stale-data yes
+slave-serve-stale-data {{ redis_slave_serve_stale_data }}
 
 # You can configure a slave instance to accept writes or not. Writing against
 # a slave instance may be useful to store some ephemeral data (because data
@@ -246,7 +246,7 @@ slave-serve-stale-data yes
 # such as CONFIG, DEBUG, and so forth. To a limited extent you can improve
 # security of read only slaves using 'rename-command' to shadow all the
 # administrative / dangerous commands.
-slave-read-only yes
+slave-read-only {{ redis_slave_read_only }}
 
 # Replication SYNC strategy: disk or socket.
 #
@@ -277,7 +277,7 @@ slave-read-only yes
 #
 # With slow disks and fast (large bandwidth) networks, diskless replication
 # works better.
-repl-diskless-sync no
+repl-diskless-sync {{ redis_repl_diskless_sync }}
 
 # When diskless replication is enabled, it is possible to configure the delay
 # the server waits in order to spawn the child that transfers the RDB via socket
@@ -289,13 +289,13 @@ repl-diskless-sync no
 #
 # The delay is specified in seconds, and by default is 5 seconds. To disable
 # it entirely just set it to 0 seconds and the transfer will start ASAP.
-repl-diskless-sync-delay 5
+repl-diskless-sync-delay {{ redis_repl_diskless_sync_delay }}
 
 # Slaves send PINGs to server in a predefined interval. It's possible to change
 # this interval with the repl_ping_slave_period option. The default value is 10
 # seconds.
 #
-# repl-ping-slave-period 10
+repl-ping-slave-period {{ redis_repl_ping_slave_period }}
 
 # The following option sets the replication timeout for:
 #
@@ -307,7 +307,7 @@ repl-diskless-sync-delay 5
 # specified for repl-ping-slave-period otherwise a timeout will be detected
 # every time there is low traffic between the master and the slave.
 #
-# repl-timeout 60
+repl-timeout {{ redis_repl_timeout }}
 
 # Disable TCP_NODELAY on the slave socket after SYNC?
 #
@@ -322,7 +322,7 @@ repl-diskless-sync-delay 5
 # By default we optimize for low latency, but in very high traffic conditions
 # or when the master and slaves are many hops away, turning this to "yes" may
 # be a good idea.
-repl-disable-tcp-nodelay no
+repl-disable-tcp-nodelay {{ redis_repl_disable_tcp_nodelay }}
 
 # Set the replication backlog size. The backlog is a buffer that accumulates
 # slave data when slaves are disconnected for some time, so that when a slave
@@ -335,7 +335,7 @@ repl-disable-tcp-nodelay no
 #
 # The backlog is only allocated once there is at least a slave connected.
 #
-# repl-backlog-size 1mb
+{% if redis_repl_backlog_size %}repl-backlog-size {{ redis_repl_backlog_size }}{% endif %}
 
 # After a master has no longer connected slaves for some time, the backlog
 # will be freed. The following option configures the amount of seconds that
@@ -344,7 +344,7 @@ repl-disable-tcp-nodelay no
 #
 # A value of 0 means to never release the backlog.
 #
-# repl-backlog-ttl 3600
+{% if redis_repl_backlog_ttl %}repl-backlog-ttl {{ redis_repl_backlog_ttl }}{% endif %}
 
 # The slave priority is an integer number published by Redis in the INFO output.
 # It is used by Redis Sentinel in order to select a slave to promote into a
@@ -359,7 +359,7 @@ repl-disable-tcp-nodelay no
 # Redis Sentinel for promotion.
 #
 # By default the priority is 100.
-slave-priority 100
+slave-priority {{ redis_slave_priority }}
 
 # It is possible for a master to stop accepting writes if there are less than
 # N slaves connected, having a lag less or equal than M seconds.
@@ -382,6 +382,8 @@ slave-priority 100
 #
 # By default min-slaves-to-write is set to 0 (feature disabled) and
 # min-slaves-max-lag is set to 10.
+min-slaves-to-write {{ redis_min_slaves_to_write }}
+min-slaves-max-lag {{ redis_min_slaves_max_lag }}
 
 ################################## SECURITY ###################################
 
@@ -396,7 +398,7 @@ slave-priority 100
 # 150k passwords per second against a good box. This means that you should
 # use a very strong password otherwise it will be very easy to break.
 #
-# requirepass foobared
+{% if redis_password %}requirepass {{ redis_password }}{% endif %}
 
 # Command renaming.
 #
@@ -476,7 +478,7 @@ maxmemory {{ redis_maxmemory }}
 #
 # The default is:
 #
-# maxmemory-policy {{ redis_maxmemory_policy }}
+maxmemory-policy {{ redis_maxmemory_policy }}
 
 # LRU and minimal TTL algorithms are not precise algorithms but approximated
 # algorithms (in order to save memory), so you can tune it for speed or
@@ -580,8 +582,8 @@ no-appendfsync-on-rewrite {{ redis_no_appendfsync_on_rewrite }}
 # Specify a percentage of zero in order to disable the automatic AOF
 # rewrite feature.
 
-auto-aof-rewrite-percentage 100
-auto-aof-rewrite-min-size 64mb
+auto-aof-rewrite-percentage {{ redis_auto_aof_rewrite_percentage }}
+auto-aof-rewrite-min-size {{ redis_auto_aof_rewrite_min_size }}
 
 # An AOF file may be found to be truncated at the end during the Redis
 # startup process, when the AOF data gets loaded back into memory.
@@ -605,7 +607,7 @@ auto-aof-rewrite-min-size 64mb
 # the server will still exit with an error. This option only applies when
 # Redis will try to read more data from the AOF file but not enough bytes
 # will be found.
-aof-load-truncated yes
+aof-load-truncated {{ redis_aof_load_truncated }}
 
 ################################ LUA SCRIPTING  ###############################
 
@@ -623,7 +625,7 @@ aof-load-truncated yes
 # termination of the script.
 #
 # Set it to 0 or a negative value for unlimited execution without warnings.
-lua-time-limit 5000
+lua-time-limit {{ redis_lua_time_limit }}
 
 ################################ REDIS CLUSTER  ###############################
 #
