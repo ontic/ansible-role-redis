@@ -80,6 +80,7 @@
     group: '{{ redis_group }}'
     home: '{{ redis_install_dir }}'
     comment: Redis
+    state: present
     system: yes
 
 - name: Redis | Create configuration directory.
