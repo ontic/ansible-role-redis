@@ -9,6 +9,6 @@
 
 - hosts: all
   vars:
-    redis_ppa: ppa:chris-lea/redis-server
+    ansible_service_mgr: systemd
   roles:
     - { role: ../../ }
