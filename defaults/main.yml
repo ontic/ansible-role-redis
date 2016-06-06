@@ -43,7 +43,6 @@ redis_stop_writes_on_bgsave_error: 'yes'
 redis_rdbcompression: 'yes'
 redis_rdbchecksum: 'yes'
 redis_dbfilename: dump.rdb
-redis_dir: /var/lib/redis
 redis_slaveof: false
 redis_slave_serve_stale_data: 'yes'
 redis_slave_read_only: 'yes'
