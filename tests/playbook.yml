@@ -8,5 +8,8 @@
 ---
 
 - hosts: 'all'
+  vars:
+    redis_ppa: 'ppa:chris-lea/redis-server'
+    redis_enable_repo: 'epel'
   roles:
     - { role: 'ontic.redis' }
