@@ -7,7 +7,7 @@
 
 ---
 
-- name: Redis | Enable Redis service.
+- name: 'Redis | Enable Redis service.'
   become: yes
   service:
     name: '{{ redis_service_name }}'

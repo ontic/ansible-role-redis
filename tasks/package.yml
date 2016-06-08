@@ -7,14 +7,14 @@
 
 ---
 
-- name: Redis | Debian | Add launchpad PPA.
+- name: 'Redis | Debian | Add launchpad PPA.'
   become: yes
   apt_repository:
     repo: '{{ redis_ppa }}'
     update_cache: yes
-  when: ansible_os_family == 'Debian' and redis_ppa
+  when: '{{ ansible_os_family == "Debian" and redis_ppa | default(None) != None }}'
 
-- name: Redis | Debian | Install Redis packages.
+- name: 'Redis | Debian | Install Redis packages.'
   become: yes
   apt:
     name: '{{ item.name if item.version is not defined else item.name + "=" + item.version }}'
@@ -29,9 +29,9 @@
     update_cache: '{{ item.update_cache | default(omit) }}'
     upgrade: '{{ item.upgrade | default(omit) }}'
   with_items: '{{ redis_packages }}'
-  when: ansible_os_family == 'Debian' and redis_packages
+  when: '{{ ansible_os_family == "Debian" }}'
 
-- name: Redis | RedHat | Install Redis packages.
+- name: 'Redis | RedHat | Install Redis packages.'
   become: yes
   yum:
     name: '{{ item.name if item.version is not defined else item.name + "-" + item.version }}'
@@ -44,4 +44,4 @@
     state: '{{ item.state | default(omit) }}'
     update_cache: '{{ item.update_cache | default(omit) }}'
   with_items: '{{ redis_packages }}'
-  when: ansible_os_family == 'RedHat' and redis_packages
+  when: '{{ ansible_os_family == "RedHat" }}'

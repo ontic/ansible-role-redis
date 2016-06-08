@@ -7,44 +7,44 @@
 
 ---
 
-- name: Redis | Include OS-specific variables.
+- name: 'Redis | Include OS-specific variables.'
   include_vars: '{{ ansible_os_family }}.yml'
   tags:
-    - redis
-    - redis-package
-    - redis-configure
-    - redis-service
-    - package
-    - configure
-    - service
+    - 'redis'
+    - 'redis-package'
+    - 'redis-configure'
+    - 'redis-service'
+    - 'package'
+    - 'configure'
+    - 'service'
 
-- name: Redis | Define Redis packages.
+- name: 'Redis | Define Redis packages.'
   set_fact:
-    redis_packages: '{{ redis_default_packages | list }}'
-  when: not redis_packages
+    redis_packages: '{{ redis_default_packages }}'
+  when: '{{ not redis_packages }}'
   tags:
-    - redis
-    - redis-package
-    - redis-configure
-    - redis-service
-    - package
-    - configure
-    - service
+    - 'redis'
+    - 'redis-package'
+    - 'redis-configure'
+    - 'redis-service'
+    - 'package'
+    - 'configure'
+    - 'service'
 
-- include: package.yml
+- include: 'package.yml'
   tags:
-    - redis
-    - redis-package
-    - package
+    - 'redis'
+    - 'redis-package'
+    - 'package'
 
-- include: configure.yml
+- include: 'configure.yml'
   tags:
-    - redis
-    - redis-configure
-    - configure
+    - 'redis'
+    - 'redis-configure'
+    - 'configure'
 
-- include: service.yml
+- include: 'service.yml'
   tags:
-    - redis
-    - redis-service
-    - service
+    - 'redis'
+    - 'redis-service'
+    - 'service'

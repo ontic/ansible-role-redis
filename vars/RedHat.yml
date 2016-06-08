@@ -8,7 +8,7 @@
 ---
 
 redis_default_packages:
-  - name: redis
+  - name: 'redis'
 
-redis_service_name: redis
-redis_conf_file: /etc/redis.conf
+redis_service_name: 'redis'
+redis_conf_file: '/etc/redis.conf'

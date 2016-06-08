@@ -7,8 +7,8 @@
 
 ---
 
-- name: restart redis
+- name: 'restart redis'
   become: yes
   service:
     name: '{{ redis_service_name }}'
-    state: restarted
+    state: 'restarted'
