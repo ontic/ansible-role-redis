@@ -32,8 +32,8 @@ before_install:
 
 script:
   - 'container_id=$(mktemp)'
-  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm redis-server --version'
   - 'sudo docker run --detach --volume="${PWD}":/etc/ansible/roles/${role}:ro ${run_opts} ${distribution}-${version}:ansible "${init}" > "${container_id}"'
+  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm redis-server --version'
   - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/${role}/tests/${playbook} --syntax-check'
   - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/${role}/tests/${playbook}'
   - >
