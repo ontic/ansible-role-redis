@@ -32,13 +32,13 @@
     reload: yes
     ignoreerrors: yes
 
-#- name: 'Redis | Configure Redis conf file.'
-#  become: yes
-#  template:
-#    src: '{{ redis_conf_template }}'
-#    dest: '{{ redis_conf_file }}'
-#    owner: 'root'
-#    group: 'root'
-#    mode: '0644'
-#  notify: 'restart redis'
-#  when: '{{ redis_conf_template | default(None) != None }}'
+- name: 'Redis | Configure Redis conf file.'
+  become: yes
+  template:
+    src: '{{ redis_conf_template }}'
+    dest: '{{ redis_conf_file }}'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+  notify: 'restart redis'
+  when: '{{ redis_conf_template | default(None) != None }}'
