@@ -45,6 +45,7 @@ script:
   - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm cat /etc/redis.conf'
   - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ls /var/log/redis'
   - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm cat /var/log/redis/redis-server.log'
+  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm cat /var/log/redis/redis.log'
   - 'sudo docker stop "$(cat ${container_id})"'
 
 notifications:
