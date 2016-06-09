@@ -7,31 +7,6 @@
 
 ---
 
-- name: 'Redis | Retrieve system somaxconn setting.'
-  become: yes
-  command: 'sysctl -n net.core.somaxconn'
-  register: 'sysctl_somaxconn'
-  changed_when: false
-
-- name: 'Redis | Override system somaxconn setting.'
-  become: yes
-  sysctl:
-    name: 'net.core.somaxconn'
-    value: '{{ redis_tcp_backlog }}'
-    state: 'present'
-    reload: yes
-    ignoreerrors: yes
-  when: '{{ sysctl_somaxconn.stdout | int < redis_tcp_backlog }}'
-
-- name: 'Redis | Enable system overcommit memory.'
-  become: yes
-  sysctl:
-    name: 'vm.overcommit_memory'
-    value: '1'
-    state: 'present'
-    reload: yes
-    ignoreerrors: yes
-
 - name: 'Redis | Configure Redis conf file.'
   become: yes
   template:
