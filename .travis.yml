@@ -41,6 +41,8 @@ script:
     && (echo "Idempotence test: Passed" && exit 0)
     || (echo "Idempotence test: Failed" && exit 1)
   - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm redis-server --version'
+  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm cat /etc/redis/redis.conf'
+  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm cat /etc/redis.conf'
   - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm cat /var/log/redis/redis-server.log'
   - 'sudo docker stop "$(cat ${container_id})"'
 
