@@ -27,19 +27,19 @@
     - 'configure'
     - 'service'
 
-- include: 'package.yml'
+- import_tasks: 'package.yml'
   tags:
     - 'redis'
     - 'redis-package'
     - 'package'
 
-- include: 'configure.yml'
+- import_tasks: 'configure.yml'
   tags:
     - 'redis'
     - 'redis-configure'
     - 'configure'
 
-- include: 'service.yml'
+- import_tasks: 'service.yml'
   tags:
     - 'redis'
     - 'redis-service'
